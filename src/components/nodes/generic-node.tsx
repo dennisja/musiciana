@@ -1,6 +1,6 @@
 import { useStore } from "@/lib/store";
 import { Handle, Position } from "@xyflow/react";
-import { SlidersHorizontal, Waves, Speaker } from "lucide-react";
+import { SlidersHorizontal, Waves, Speaker, Play, Pause } from "lucide-react";
 import type { MuseFlowNode } from "@/lib/types/nodes";
 
 type GenericNodeProps = {
@@ -34,12 +34,20 @@ export const GenericNode = ({ id, data }: GenericNodeProps) => {
   const node = useStore((s) => s.nodes.find((n) => n.id === id));
   const selectNode = useStore((s) => s.selectNode);
   const selectedNodeId = useStore((s) => s.selectedNodeId);
+  const isRunning = useStore((s) => s.isRunning);
+  const toggleRunning = useStore((s) => s.toggleRunning);
 
   if (!node) return null;
 
   const config = nodeConfig[node.type];
   const Icon = config.icon;
   const isSelected = selectedNodeId === id;
+  const isOutputNode = node.type === "audioOutput";
+
+  const handlePlayClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleRunning();
+  };
 
   return (
     <div
@@ -68,7 +76,25 @@ export const GenericNode = ({ id, data }: GenericNodeProps) => {
 
       {/* Content - Minimal display, editing happens in side panel */}
       <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
-        Click to edit
+        {isOutputNode ? (
+          <button
+            onClick={handlePlayClick}
+            className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 mx-auto ${
+              isRunning
+                ? "bg-emerald-500 hover:bg-emerald-600 text-white"
+                : "bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
+            }`}
+            title={isRunning ? "Stop audio" : "Start audio"}
+          >
+            {isRunning ? (
+              <Pause className="w-8 h-8" fill="currentColor" />
+            ) : (
+              <Play className="w-8 h-8" fill="currentColor" />
+            )}
+          </button>
+        ) : (
+          "Click to edit"
+        )}
       </div>
 
       {/* Output Handle */}
