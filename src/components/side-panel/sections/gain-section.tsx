@@ -1,6 +1,6 @@
 import { useStore } from "@/lib/store";
 import type { AmplifierNode } from "@/lib/types/nodes";
-import { Volume2 } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 
 type GainSectionProps = {
   node: AmplifierNode;
@@ -28,13 +28,13 @@ export const GainSection = ({ node }: GainSectionProps) => {
   return (
     <div className="p-6 space-y-6">
       {/* Node Info */}
-      <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
+      <div className="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-gray-700">
         <div className="w-12 h-12 bg-[#3b82f6] rounded-lg flex items-center justify-center">
-          <Volume2 className="w-6 h-6 text-white" />
+          <SlidersHorizontal className="w-6 h-6 text-white" />
         </div>
         <div>
-          <h3 className="font-semibold text-gray-900">Gain Node</h3>
-          <p className="text-sm text-gray-500">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100">Gain Node</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             Adjust signal amplitude
           </p>
         </div>
@@ -42,20 +42,20 @@ export const GainSection = ({ node }: GainSectionProps) => {
 
       {/* Label Input */}
       <div className="space-y-2">
-        <label className="text-sm font-semibold text-gray-900">Label</label>
+        <label className="text-sm font-semibold text-gray-900 dark:text-gray-100">Label</label>
         <input
           type="text"
           value={node.data.label}
           onChange={(e) => handleLabelChange(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+          className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-gray-900 dark:text-gray-100"
           placeholder="Enter node label"
         />
       </div>
 
       {/* Gain Slider */}
       <div className="space-y-2">
-        <label className="text-sm font-semibold text-gray-900">Gain</label>
-        <p className="text-xs text-gray-500">
+        <label className="text-sm font-semibold text-gray-900 dark:text-gray-100">Gain</label>
+        <p className="text-xs text-gray-500 dark:text-gray-400">
           Control the volume/amplitude of the audio signal
         </p>
         <input
@@ -65,7 +65,7 @@ export const GainSection = ({ node }: GainSectionProps) => {
           step={0.01}
           value={node.data.gain}
           onChange={(e) => handleGainChange(Number(e.target.value))}
-          className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer
+          className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full appearance-none cursor-pointer
             [&::-webkit-slider-thumb]:appearance-none
             [&::-webkit-slider-thumb]:w-4
             [&::-webkit-slider-thumb]:h-4
@@ -81,11 +81,11 @@ export const GainSection = ({ node }: GainSectionProps) => {
             [&::-moz-range-thumb]:cursor-pointer"
         />
         <div className="flex justify-between text-sm">
-          <span className="text-gray-500">0%</span>
-          <span className="text-gray-900 font-medium">
+          <span className="text-gray-500 dark:text-gray-400">0%</span>
+          <span className="text-gray-900 dark:text-gray-100 font-medium">
             {(node.data.gain * 100).toFixed(0)}%
           </span>
-          <span className="text-gray-500">100%</span>
+          <span className="text-gray-500 dark:text-gray-400">100%</span>
         </div>
       </div>
     </div>

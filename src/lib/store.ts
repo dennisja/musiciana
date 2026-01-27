@@ -27,6 +27,8 @@ type Store = {
   edges: Edge[];
   isRunning: boolean;
   selectedNodeId: string | null;
+  activeTab: "library" | "settings";
+  theme: "light" | "dark";
   addNode: (node: MuseFlowNode) => void;
   addEdge: (edge: Connection) => void;
   onNodesChange: (changes: NodeChange<MuseFlowNode>[]) => void;
@@ -34,15 +36,19 @@ type Store = {
   updateNodeData: (nodeData: UpdateMuseFlowNodeData) => void;
   toggleRunning: () => void;
   removeNodes: (nodes: MuseFlowNode[]) => void;
-  createNode: (type: MuseFlowNodeType) => void;
+  createNode: (type: MuseFlowNodeType, position?: { x: number; y: number }) => void;
   selectNode: (nodeId: string) => void;
   clearSelectedNode: () => void;
+  setActiveTab: (tab: "library" | "settings") => void;
+  toggleTheme: () => void;
 };
 
 const useStore = createWithEqualityFn<Store>((set, get) => ({
   nodes: [],
   edges: [],
   selectedNodeId: null,
+  activeTab: "library",
+  theme: "dark",
   addNode: (node: MuseFlowNode) => {
     set({ nodes: [...get().nodes, node] });
   },
@@ -86,9 +92,8 @@ const useStore = createWithEqualityFn<Store>((set, get) => ({
       set({ isRunning: isRunning() });
     });
   },
-  createNode: (type: MuseFlowNodeType) => {
+  createNode: (type: MuseFlowNodeType, position = { x: 0, y: 0 }) => {
     const id = generateUUID();
-    const position = { x: 0, y: 0 };
 
     switch (type) {
       case "oscillator": {
@@ -150,10 +155,23 @@ const useStore = createWithEqualityFn<Store>((set, get) => ({
     }
   },
   selectNode: (nodeId: string) => {
-    set({ selectedNodeId: nodeId });
+    set({ selectedNodeId: nodeId, activeTab: "settings" });
   },
   clearSelectedNode: () => {
     set({ selectedNodeId: null });
+  },
+  setActiveTab: (tab: "library" | "settings") => {
+    set({ activeTab: tab });
+  },
+  toggleTheme: () => {
+    const newTheme = get().theme === "light" ? "dark" : "light";
+    set({ theme: newTheme });
+    // Apply theme to document
+    if (newTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
   },
 }));
 
