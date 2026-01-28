@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@liveblocks/client": "^3.13.3",
+    "@liveblocks/react": "^3.13.3",
+    "@liveblocks/zustand": "^3.13.3",
     "@xyflow/react": "^12.10.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

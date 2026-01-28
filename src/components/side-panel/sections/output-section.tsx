@@ -1,21 +1,15 @@
-import { useStore, type Store } from "@/lib/store";
+import { useStore } from "@/lib/store";
 import type { AudioOutputNode } from "@/lib/types/nodes";
 import { Speaker, Volume2, VolumeX } from "lucide-react";
-import { shallow } from "zustand/shallow";
-
-
-const selector = (store: Store) => ({
-  updateNodeData: store.updateNodeData,
-  toggleRunning: store.toggleRunning,
-  isRunning: store.isRunning,
-});
 
 type OutputSectionProps = {
   node: AudioOutputNode;
 };
 
 export const OutputSection = ({ node }: OutputSectionProps) => {
-  const { updateNodeData, toggleRunning, isRunning } = useStore(selector, shallow);
+  const updateNodeData = useStore((state) => state.updateNodeData);
+  const toggleRunning = useStore((state) => state.toggleRunning);
+  const isRunning = useStore((state) => state.isRunning);
 
   const handleLabelChange = (value: string) => {
     updateNodeData({

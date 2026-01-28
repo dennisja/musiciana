@@ -1,11 +1,6 @@
-import { useStore, type Store } from "@/lib/store";
+import { useStore } from "@/lib/store";
 import type { OscillatorNode } from "@/lib/types/nodes";
 import { Waves, ChevronDown } from "lucide-react";
-import { shallow } from "zustand/shallow";
-
-const selector = (store: Store) => ({
-  updateNodeData: store.updateNodeData,
-});
 
 type OscillatorSectionProps = {
   node: OscillatorNode;
@@ -14,7 +9,7 @@ type OscillatorSectionProps = {
 type Waveform = "sine" | "square" | "triangle" | "sawtooth";
 
 export const OscillatorSection = ({ node }: OscillatorSectionProps) => {
-  const { updateNodeData } = useStore(selector, shallow);
+  const updateNodeData = useStore((state) => state.updateNodeData);
 
   const handleFrequencyChange = (value: number) => {
     updateNodeData({
