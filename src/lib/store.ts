@@ -5,7 +5,7 @@ import {
   type EdgeChange,
   type NodeChange,
 } from "@xyflow/react";
-import { createWithEqualityFn } from "zustand/traditional";
+import { create } from "zustand";
 import { generateUUID } from "./uuid";
 import type { Edge } from "./types";
 import type {
@@ -21,14 +21,21 @@ import {
   toggleAudio,
   updateAudioNode,
 } from "./audio";
+import { liveblocks } from "@liveblocks/zustand";
+import type { WithLiveblocks } from "@liveblocks/zustand";
+import { client } from "../liveblocks.config";
+
+type Cursor = { x: number; y: number } | null;
 
 type Store = {
+  cursor: Cursor;
   nodes: MuseFlowNode[];
   edges: Edge[];
   isRunning: boolean;
   selectedNodeId: string | null;
   activeTab: "library" | "settings";
   theme: "light" | "dark";
+  setCursor: (cursor: Cursor) => void;
   addNode: (node: MuseFlowNode) => void;
   addEdge: (edge: Connection) => void;
   onNodesChange: (changes: NodeChange<MuseFlowNode>[]) => void;
@@ -43,12 +50,16 @@ type Store = {
   toggleTheme: () => void;
 };
 
-const useStore = createWithEqualityFn<Store>((set, get) => ({
-  nodes: [],
-  edges: [],
-  selectedNodeId: null,
-  activeTab: "library",
-  theme: "dark",
+const useStore = create<WithLiveblocks<Store>>()(
+  liveblocks(
+    (set, get) => ({
+      cursor: null,
+      nodes: [],
+      edges: [],
+      selectedNodeId: null,
+      activeTab: "library",
+      theme: "dark",
+      setCursor: (cursor: Cursor) => set({ cursor }),
   addNode: (node: MuseFlowNode) => {
     set({ nodes: [...get().nodes, node] });
   },
@@ -69,7 +80,7 @@ const useStore = createWithEqualityFn<Store>((set, get) => ({
   updateNodeData: (nodeData: UpdateMuseFlowNodeData) => {
     updateAudioNode(nodeData);
     set({
-      nodes: get().nodes.map<MuseFlowNode>((node) =>
+      nodes: get().nodes.map((node: MuseFlowNode) =>
         node.id === nodeData.id
           ? ({
               ...node,
@@ -81,10 +92,10 @@ const useStore = createWithEqualityFn<Store>((set, get) => ({
     });
   },
   removeNodes: (nodes: MuseFlowNode[]) => {
-    nodes.forEach((node) => {
+    nodes.forEach((node: MuseFlowNode) => {
       removeAudioNode(node.id);
     });
-    set({ nodes: get().nodes.filter((node) => !nodes.includes(node)) });
+    set({ nodes: get().nodes.filter((node: MuseFlowNode) => !nodes.includes(node)) });
   },
   isRunning: isRunning(),
   toggleRunning: () => {
@@ -132,7 +143,7 @@ const useStore = createWithEqualityFn<Store>((set, get) => ({
       case "audioOutput": {
         // Only allow one output node
         const hasOutputNode = get().nodes.some(
-          (node) => node.type === "audioOutput"
+          (node: MuseFlowNode) => node.type === "audioOutput"
         );
         if (hasOutputNode) return;
 
@@ -163,17 +174,24 @@ const useStore = createWithEqualityFn<Store>((set, get) => ({
   setActiveTab: (tab: "library" | "settings") => {
     set({ activeTab: tab });
   },
-  toggleTheme: () => {
-    const newTheme = get().theme === "light" ? "dark" : "light";
-    set({ theme: newTheme });
-    // Apply theme to document
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
+      toggleTheme: () => {
+        const newTheme = get().theme === "light" ? "dark" : "light";
+        set({ theme: newTheme });
+        // Apply theme to document
+        if (newTheme === "dark") {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      },
+    }),
+    {
+      client,
+      presenceMapping: { cursor: true },
+      storageMapping: { nodes: true, edges: true },
     }
-  },
-}));
+  )
+);
 
 export { useStore };
-export type { Store };
+export type { Store, Cursor };
